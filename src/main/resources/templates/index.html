@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Estágios</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+
+<header>
+    <h1>Sistema de Controle de Estágios</h1>
+    <p>Cadastro e gerenciamento de estágios</p>
+</header>
+
+<nav>
+    <a href="#ensino">Ensino</a>
+    <a href="#alunos">Alunos</a>
+    <a href="#empresas">Empresas</a>
+    <a href="#contratos">Contratos</a>
+</nav>
+
+<main>
+
+    <div class="mensagem sucesso" th:if="${sucesso}" th:text="${sucesso}"></div>
+    <div class="mensagem erro" th:if="${erro}" th:text="${erro}"></div>
+
+    <section id="ensino">
+
+        <h2>Instituições de Ensino</h2>
+
+        <h3 th:text="${idEnsinoEdicao != null ? 'Editar instituição' : 'Cadastrar instituição'}"></h3>
+
+        <form th:action="@{/pagina/ensinos}"
+              th:object="${ensinoFormulario}"
+              method="post">
+
+            <input type="hidden" name="id" th:value="${idEnsinoEdicao}">
+
+            <label>Nome da instituição</label>
+            <input type="text" th:field="*{nome}" required>
+
+            <div class="botoes">
+                <button type="submit">Salvar</button>
+                <a th:if="${idEnsinoEdicao != null}" th:href="@{/}" class="botao-secundario">Cancelar</a>
+            </div>
+        </form>
+
+        <h3>Instituições cadastradas</h3>
+
+        <div class="tabela-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Instituição</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ensino : ${ensinos}">
+                        <td th:text="${ensino.id}"></td>
+                        <td th:text="${ensino.nome}"></td>
+                        <td class="acoes">
+                            <a th:href="@{/(editar='ensino',id=${ensino.id})}">Editar</a>
+
+                            <form th:action="@{/pagina/ensinos/{id}/excluir(id=${ensino.id})}" method="post">
+                                <button type="submit" class="excluir">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(ensinos)}">
+                        <td colspan="3">Nenhuma instituição cadastrada.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="alunos">
+
+        <h2>Alunos</h2>
+
+        <h3 th:text="${idAlunoEdicao != null ? 'Editar aluno' : 'Cadastrar aluno'}"></h3>
+
+        <form th:action="@{/pagina/alunos}"
+              th:object="${alunoFormulario}"
+              method="post">
+
+            <input type="hidden" name="id" th:value="${idAlunoEdicao}">
+
+            <div class="campos">
+
+                <div>
+                    <label>Nome completo</label>
+                    <input type="text" th:field="*{nomeCompleto}" required>
+                </div>
+
+                <div>
+                    <label>Telefone</label>
+                    <input type="text" th:field="*{telefone}" required>
+                </div>
+
+                <div>
+                    <label>E-mail</label>
+                    <input type="email" th:field="*{email}" required>
+                </div>
+
+                <div>
+                    <label>Curso</label>
+                    <input type="text" th:field="*{curso}" required>
+                </div>
+
+                <div>
+                    <label>Semestre</label>
+                    <input type="number" th:field="*{semestre}" min="1" required>
+                </div>
+
+                <div>
+                    <label>Período</label>
+                    <input type="text" th:field="*{periodo}" required>
+                </div>
+
+                <div>
+                    <label>Instituição de ensino</label>
+                    <select th:field="*{idEnsino}" required>
+                        <option value="">Selecione</option>
+                        <option th:each="ensino : ${ensinos}"
+                                th:value="${ensino.id}"
+                                th:text="${ensino.nome}">
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="botoes">
+                <button type="submit">Salvar</button>
+                <a th:if="${idAlunoEdicao != null}" th:href="@{/}" class="botao-secundario">Cancelar</a>
+            </div>
+        </form>
+
+        <h3>Alunos cadastrados</h3>
+
+        <div class="tabela-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Curso</th>
+                        <th>Semestre</th>
+                        <th>Instituição</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="aluno : ${alunos}">
+                        <td th:text="${aluno.id}"></td>
+                        <td th:text="${aluno.nomeCompleto}"></td>
+                        <td th:text="${aluno.curso}"></td>
+                        <td th:text="${aluno.semestre}"></td>
+                        <td th:text="${aluno.ensino}"></td>
+                        <td class="acoes">
+                            <a th:href="@{/(editar='aluno',id=${aluno.id})}">Editar</a>
+
+                            <form th:action="@{/pagina/alunos/{id}/excluir(id=${aluno.id})}" method="post">
+                                <button type="submit" class="excluir">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(alunos)}">
+                        <td colspan="6">Nenhum aluno cadastrado.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section id="empresas">
+
+        <h2>Empresas</h2>
+
+        <h3 th:text="${idEmpresaEdicao != null ? 'Editar empresa' : 'Cadastrar empresa'}"></h3>
+
+        <form th:action="@{/pagina/empresas}"
+              th:object="${empresaFormulario}"
+              method="post">
+
+            <input type="hidden" name="id" th:value="${idEmpresaEdicao}">
+
+            <div class="campos">
+
+                <div>
+                    <label>Nome da empresa</label>
+                    <input type="text" th:field="*{nomeEmpresa}" required>
+                </div>
+
+                <div>
+                    <label>Área de atuação</label>
+                    <input type="text" th:field="*{areaAtuacao}">
+                </div>
+
+                <div>
+                    <label>Cidade</label>
+                    <input type="text" th:field="*{cidade}">
+                </div>
+
+                <div>
+                    <label>CEP</label>
+                    <input type="text" th:field="*{cep}">
+                </div>
+
+                <div>
+                    <label>E-mail</label>
+                    <input type="email" th:field="*{email}">
+                </div>
+
+                <div>
+                    <label>Site</label>
+                    <input type="text" th:field="*{site}">
+                </div>
+
+                <div>
+                    <label>Telefone</label>
+                    <input type="text" th:field="*{tel}">
+                </div>
+
+                <div>
+                    <label>Nome do contato</label>
+                    <input type="text" th:field="*{nomeContato}">
+                </div>
+
+                <div>
+                    <label>Cargo do contato</label>
+                    <input type="text" th:field="*{cargoContato}">
+                </div>
+
+                <div>
+                    <label>Departamento</label>
+                    <input type="text" th:field="*{departamento}">
+                </div>
+
+                <div>
+                    <label>LinkedIn</label>
+                    <input type="text" th:field="*{linked}">
+                </div>
+
+            </div>
+
+            <div class="botoes">
+                <button type="submit">Salvar</button>
+                <a th:if="${idEmpresaEdicao != null}" th:href="@{/}" class="botao-secundario">Cancelar</a>
+            </div>
+        </form>
+
+        <h3>Empresas cadastradas</h3>
+
+        <div class="tabela-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Empresa</th>
+                        <th>Cidade</th>
+                        <th>E-mail</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="empresa : ${empresas}">
+                        <td th:text="${empresa.id}"></td>
+                        <td th:text="${empresa.nomeEmpresa}"></td>
+                        <td th:text="${empresa.cidade}"></td>
+                        <td th:text="${empresa.email}"></td>
+                        <td class="acoes">
+                            <a th:href="@{/(editar='empresa',id=${empresa.id})}">Editar</a>
+
+                            <form th:action="@{/pagina/empresas/{id}/excluir(id=${empresa.id})}" method="post">
+                                <button type="submit" class="excluir">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(empresas)}">
+                        <td colspan="5">Nenhuma empresa cadastrada.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <section id="contratos">
+
+        <h2>Contratos de Estágio</h2>
+
+        <h3 th:text="${idContratoEdicao != null ? 'Editar contrato' : 'Cadastrar contrato'}"></h3>
+
+        <form th:action="@{/pagina/contratos}"
+              th:object="${contratoFormulario}"
+              method="post">
+
+            <input type="hidden" name="id" th:value="${idContratoEdicao}">
+
+            <div class="campos">
+
+                <div>
+                    <label>Aluno</label>
+                    <select th:field="*{idAluno}" required>
+                        <option value="">Selecione</option>
+                        <option th:each="aluno : ${alunos}"
+                                th:value="${aluno.id}"
+                                th:text="${aluno.nomeCompleto}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Empresa contratante</label>
+                    <select th:field="*{idEmpresa}" required>
+                        <option value="">Selecione</option>
+                        <option th:each="empresa : ${empresas}"
+                                th:value="${empresa.id}"
+                                th:text="${empresa.nomeEmpresa}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Data de início</label>
+                    <input type="date" th:field="*{dataInicio}" required>
+                </div>
+
+                <div>
+                    <label>Data de término</label>
+                    <input type="date" th:field="*{dataFim}" required>
+                </div>
+
+                <div>
+                    <label>Carga horária</label>
+                    <input type="number" th:field="*{cargaHoraria}" min="1" required>
+                </div>
+
+                <div>
+                    <label>Tipo de carga horária</label>
+                    <select th:field="*{tipoCargaHoraria}" required>
+                        <option value="">Selecione</option>
+                        <option value="Diária">Diária</option>
+                        <option value="Semanal">Semanal</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Área do estágio</label>
+                    <input type="text" th:field="*{areaEstagio}" required>
+                </div>
+
+                <div>
+                    <label>Supervisor responsável</label>
+                    <input type="text" th:field="*{supervisorResponsavel}" required>
+                </div>
+
+                <div>
+                    <label>Cargo do supervisor</label>
+                    <input type="text" th:field="*{cargoSupervisor}" required>
+                </div>
+
+                <div class="campo-completo">
+                    <label>Atividades principais</label>
+                    <textarea th:field="*{atividadesPrincipais}" rows="4" required></textarea>
+                </div>
+
+            </div>
+
+            <div class="botoes">
+                <button type="submit">Salvar</button>
+                <a th:if="${idContratoEdicao != null}" th:href="@{/}" class="botao-secundario">Cancelar</a>
+            </div>
+        </form>
+
+        <h3>Contratos cadastrados</h3>
+
+        <div class="tabela-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Aluno</th>
+                        <th>Empresa</th>
+                        <th>Início</th>
+                        <th>Término</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="contrato : ${contratos}">
+                        <td th:text="${contrato.id}"></td>
+                        <td th:text="${contrato.nomeAluno}"></td>
+                        <td th:text="${contrato.nomeEmpresa}"></td>
+                        <td th:text="${contrato.dataInicio}"></td>
+                        <td th:text="${contrato.dataFim}"></td>
+                        <td class="acoes">
+                            <a th:href="@{/(editar='contrato',id=${contrato.id})}">Editar</a>
+
+                            <form th:action="@{/pagina/contratos/{id}/excluir(id=${contrato.id})}" method="post">
+                                <button type="submit" class="excluir">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(contratos)}">
+                        <td colspan="6">Nenhum contrato cadastrado.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    <p>Projeto acadêmico - Sistema de Controle de Estágios</p>
+</footer>
+
+</body>
+</html>
