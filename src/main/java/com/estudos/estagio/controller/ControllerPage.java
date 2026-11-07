@@ -1,6 +1,8 @@
 
 package com.estudos.estagio.controller;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -67,6 +69,30 @@ public class ControllerPage {
         model.addAttribute("contratos", serviceContrato.listar());
 
         return "index";
+    }
+
+    @PostMapping("/pagina/formulario")
+    public String salvarFormularioCompleto(
+            @RequestParam Map<String, String> campos,
+            RedirectAttributes atributos) {
+
+        try {
+            Long idContrato = serviceContrato.enviarFormulario(campos);
+
+            atributos.addFlashAttribute(
+                    "sucesso",
+                    "Formulário enviado com sucesso. Contrato ID: " + idContrato);
+        } catch (IllegalArgumentException erro) {
+            atributos.addFlashAttribute(
+                    "erro",
+                    erro.getMessage());
+        } catch (RuntimeException erro) {
+            atributos.addFlashAttribute(
+                    "erro",
+                    "Erro ao salvar o formulário. Confira os dados informados.");
+        }
+
+        return "redirect:/#cadastro-completo";
     }
 
     @PostMapping("/pagina/ensinos")
